@@ -8,12 +8,18 @@ import {
   MessageInput,
   TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
-import "./Chat.css"; 
-
-const API_KEY = "API-KEY";
-
+import "./Chat.css"; // Import the CSS file with the provided styles
+const API_KEY = "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";
+function utterance(say, volume=1, pitch=1, rate=1) {
+  const utter = new SpeechSynthesisUtterance(say);
+  utter.volume = volume; 
+  utter.pitch = pitch; 
+  utter.rate = rate;
+  return utter; 
+}
 function App() {
   const [isListening, setIsListening] = useState(false);
+  const [msg_box_val, set_msg_box_val] = useState(null);
   const [typing, setTyping] = useState(false);
   const [messages, setMessages] = useState([
     {
@@ -21,14 +27,13 @@ function App() {
       sender: "ChatGPT",
     },
   ]);
-
+  let tts = speechSynthesis;
   const handleSend = async (message) => {
     const newMessage = {
       message,
       direction: "outgoing",
       sender: "user",
     };
-
     const newMessages = [...messages, newMessage];
 
     setMessages(newMessages);
@@ -41,29 +46,31 @@ function App() {
   useEffect(() => {
     const recognition = new window.webkitSpeechRecognition();
     recognition.interimResults = true;
-
-    const onResult = (e) => {
-
-      const transcript = Array.from(e.results)
-        .map((result) => result[0])
-        .map((result) => result.transcript)
-        .join("");
-
-      // Here, you can set the transcript to your message state
-      // setYourMessageState(transcript);
+    recognition.continuous = true;
+    recognition.lang = 'en-US';
+    recognition.onstart = () => {
+      console.log("Started");
     };
-
-    recognition.addEventListener("result", onResult);
-
+    
+    recognition.onend = () => {
+      console.log("Ended");
+    };
+    
+    recognition.onresult = (e) => {
+      console.log(e);
+    };
+    
+    recognition.onerror = function(e) {
+      console.error("Go bang your ahead and try to figure it out", e.error);
+    };
     if (isListening) {
       recognition.start();
+      tts.cancel();
     } else {
       recognition.stop();
     }
 
-    return () => {
-      recognition.removeEventListener("result", onResult);
-    };
+
   }, [isListening]);
 
   async function processMessageToChatGPT(chatMessages) {
@@ -102,10 +109,6 @@ function App() {
       .then((data) => {
         console.log(data);
         console.log(data.choices[0].message.content);
-        const utterance = new SpeechSynthesisUtterance(data.choices[0].message.content);
-        utterance.rate = 1; 
-        utterance.volume = 1; 
-        speechSynthesis.speak(utterance);
         setMessages([
           ...chatMessages,
           {
@@ -113,6 +116,8 @@ function App() {
             sender: "ChatGPT",
           },
         ]);
+        tts.resume()
+        tts.speak(utterance(data.choices[0].message.content))
         setTyping(false);
       });
   }
@@ -144,6 +149,7 @@ function App() {
               })}
             </MessageList>
             <MessageInput
+              value={msg_box_val}
               className="chat-input"
               placeholder="Empezar a chatear (Start chatting...)"
               style={{
