@@ -9,7 +9,7 @@ import {
   TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
 import "./Chat.css"; // Import the CSS file with the provided styles
-const API_KEY = "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";
+const API_KEY = "";
 function utterance(say, volume=1, pitch=1, rate=1) {
   const utter = new SpeechSynthesisUtterance(say);
   utter.volume = volume; 
