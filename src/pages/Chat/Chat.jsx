@@ -9,7 +9,7 @@ import {
   TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
 import "./Chat.css"; // Import the CSS file with the provided styles
-const API_KEY = "";
+const API_KEY = "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";
 function utterance(say, volume = 1, pitch = 1, rate = 1) {
   const utter = new SpeechSynthesisUtterance(say);
   utter.volume = volume;
@@ -52,6 +52,8 @@ function App() {
     recognition.lang = "eng-US";
     let full_transcript = [];
     let full_processed = [];
+    recognition.continuous = true;
+    recognition.lang = "eng-US";
     recognition.onstart = () => {
       console.log(`started`);
     };
@@ -59,11 +61,15 @@ function App() {
       full_processed.push(full_transcript[full_transcript.length-1]);
       console.log("Full processed: ", full_processed);
       set_msg_box_val(full_processed.join(' '));
+
+      console.log(`ended`);
       if (isListening) recognition.start();
     };
     recognition.onresult = (event) => {
       const transcript = event.results[event.results.length - 1][0].transcript;
       full_transcript.push(transcript);
+      console.log("transcript: ", transcript, isListening);
+      set_msg_box_val(transcript);
     };
     recognition.onerror = (e) => {
       console.log(`Error: ${e.error}`);
@@ -159,6 +165,7 @@ function App() {
             </MessageList>
             <MessageInput
               id="msg_box"
+
               isValidMessage={true}
               className="chat-input"
               placeholder="Empezar a chatear (Start chatting...)"
