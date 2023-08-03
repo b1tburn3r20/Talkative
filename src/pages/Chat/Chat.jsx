@@ -9,9 +9,6 @@ import {
   TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
 import "./Chat.css"; // Import the CSS file with the provided styles
-
-import soundFile from "./songs/coffeesong.mp3";
-
 const API_KEY = "";
 function utterance(say, volume = 1, pitch = 1, rate = 1) {
   const utter = new SpeechSynthesisUtterance(say);
@@ -21,12 +18,9 @@ function utterance(say, volume = 1, pitch = 1, rate = 1) {
   return utter;
 }
 function App() {
-  const audioRef = useRef(null);
   const [isListening, setIsListening] = useState(false);
   const [typing, setTyping] = useState(false);
-  const [msg_box_val, set_msg_box_val] = useState("");
-  const [volume, setVolume] = useState(0.1);
-  const [isMuted, setIsMuted] = useState(false);
+  const [msg_box_val, set_msg_box_val] = useState('');
   const [messages, setMessages] = useState([
     {
       message: "Hey, welcome. Whats on your mind?",
@@ -52,29 +46,30 @@ function App() {
   };
 
   useEffect(() => {
-    const audio = audioRef.current;
-    audio.volume = volume;
-  }, [volume]);
-
-  useEffect(() => {
     const recognition = new window.webkitSpeechRecognition();
     recognition.interimResults = true;
     recognition.continuous = false;
     recognition.lang = "eng-US";
     let full_transcript = [];
     let full_processed = [];
+    recognition.continuous = true;
+    recognition.lang = "eng-US";
     recognition.onstart = () => {
       console.log(`started`);
     };
     recognition.onend = () => {
-      full_processed.push(full_transcript[full_transcript.length - 1]);
+      full_processed.push(full_transcript[full_transcript.length-1]);
       console.log("Full processed: ", full_processed);
-      set_msg_box_val(full_processed.join(" "));
+      set_msg_box_val(full_processed.join(' '));
+
+      console.log(`ended`);
       if (isListening) recognition.start();
     };
     recognition.onresult = (event) => {
       const transcript = event.results[event.results.length - 1][0].transcript;
       full_transcript.push(transcript);
+      console.log("transcript: ", transcript, isListening);
+      set_msg_box_val(transcript);
     };
     recognition.onerror = (e) => {
       console.log(`Error: ${e.error}`);
@@ -87,8 +82,8 @@ function App() {
       recognition.stop();
     }
     return () => {
-      recognition.onend = null;
-      recognition.stop();
+        recognition.onend = null;
+        recognition.stop();
     };
   }, [isListening]);
 
@@ -145,6 +140,7 @@ function App() {
       <div className="chat-backdrop">
         <MainContainer>
           <ChatContainer className="chat-container">
+            
             <MessageList
               className="chat-history !important"
               scrollBehavior="smooth"
@@ -165,11 +161,14 @@ function App() {
                   />
                 );
               })}
+            
             </MessageList>
             <MessageInput
               id="msg_box"
+
+              isValidMessage={true}
               className="chat-input"
-              placeholder="Start chatting..."
+              placeholder="Empezar a chatear (Start chatting...)"
               value={msg_box_val}
               style={{
                 "::placeholder": { color: "#d0d0db", important: "true" },
@@ -177,25 +176,11 @@ function App() {
               onSend={handleSend}
               attachButton={false}
               sendButton={true}
-              onChange={(e) => {
-                set_msg_box_val(isListening ? msg_box_val : e);
-              }}
+              onChange={(e) => {set_msg_box_val(isListening ? msg_box_val : e)}}
             />
           </ChatContainer>
         </MainContainer>
-        <button onClick={() => setIsListening((prevState) => !prevState)}>
-          {isListening ? "Stop" : "Start"} Listening
-        </button>
-        <audio ref={audioRef} src={soundFile} loop />
-        <input
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          value={volume}
-          onChange={(e) => setVolume(e.target.value)}
-        />
-        <button onClick={() => audioRef.current.play()}>Play Audio</button>
+        <button onClick={() => setIsListening((prevState) => !prevState)}>{isListening ? "Stop" : "Start"} Listening</button>
       </div>
     </div>
   );
