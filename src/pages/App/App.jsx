@@ -4,6 +4,7 @@ import { getUser } from "../../utilities/users-service";
 import "./App.css";
 import AuthPage from "../AuthPage/AuthPage";
 import ChatPage from "../Chat/Chat";
+import ChatDevPage from "../ChatDevPage/ChatDev";
 import NavBar from "../../components/NavBar/NavBar";
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
           <Routes>
             {/* Route components in here */}
             <Route path="/" element={<ChatPage user={user} />} />
+            <Route path="/chatdev" element={<ChatDevPage user={user} />} />
           </Routes>
         </>
       ) : (

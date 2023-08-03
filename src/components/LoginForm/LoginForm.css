@@ -1,0 +1,69 @@
+/* LoginForm.css */
+.form-container {
+  position: relative;
+
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 1.5rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.input-field {
+  background-color: transparent;
+  display: block;
+  color: white;
+  width: 95%;
+  margin-top: 0.25rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+#password-input {
+  margin-top: 2rem;
+}
+.input-field:focus {
+  border-color: #3498db;
+}
+
+.submit-button {
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  outline: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: black;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 1rem;
+}
+#email-id {
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  font-size: 0.8em;
+  color: #ccc;
+}
+#password-id {
+  position: absolute;
+  top: 75px;
+  left: 20px;
+  font-size: 0.8em;
+  color: #ccc;
+}
