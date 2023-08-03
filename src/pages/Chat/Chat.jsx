@@ -9,7 +9,7 @@ import {
   TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
 import "./Chat.css"; // Import the CSS file with the provided styles
-const API_KEY = "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";
+const API_KEY = "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";
 function utterance(say, volume = 1, pitch = 1, rate = 1) {
   const utter = new SpeechSynthesisUtterance(say);
   utter.volume = volume;
@@ -20,7 +20,7 @@ function utterance(say, volume = 1, pitch = 1, rate = 1) {
 function App() {
   const [isListening, setIsListening] = useState(false);
   const [typing, setTyping] = useState(false);
-  const [msg_box_val, set_msg_box_val] = useState(null);
+  const [msg_box_val, set_msg_box_val] = useState('');
   const [messages, setMessages] = useState([
     {
       message: "Hey, welcome. Whats on your mind?",
@@ -48,19 +48,22 @@ function App() {
   useEffect(() => {
     const recognition = new window.webkitSpeechRecognition();
     recognition.interimResults = true;
-    recognition.continuous = true;
+    recognition.continuous = false;
     recognition.lang = "eng-US";
+    let full_transcript = [];
+    let full_processed = [];
     recognition.onstart = () => {
       console.log(`started`);
     };
     recognition.onend = () => {
-      console.log(`ended`);
+      full_processed.push(full_transcript[full_transcript.length-1]);
+      console.log("Full processed: ", full_processed);
+      set_msg_box_val(full_processed.join(' '));
       if (isListening) recognition.start();
     };
     recognition.onresult = (event) => {
       const transcript = event.results[event.results.length - 1][0].transcript;
-      console.log("transcript: ", transcript, isListening);
-      set_msg_box_val(transcript);
+      full_transcript.push(transcript);
     };
     recognition.onerror = (e) => {
       console.log(`Error: ${e.error}`);
@@ -131,6 +134,7 @@ function App() {
       <div className="chat-backdrop">
         <MainContainer>
           <ChatContainer className="chat-container">
+            
             <MessageList
               className="chat-history !important"
               scrollBehavior="smooth"
@@ -151,10 +155,11 @@ function App() {
                   />
                 );
               })}
+            
             </MessageList>
             <MessageInput
               id="msg_box"
-              onChange={(event) => set_msg_box_val(event.target.value)}
+              isValidMessage={true}
               className="chat-input"
               placeholder="Empezar a chatear (Start chatting...)"
               value={msg_box_val}
@@ -163,13 +168,12 @@ function App() {
               }}
               onSend={handleSend}
               attachButton={false}
-              sendButton={true} // Set this to true to show the send button
+              sendButton={true}
+              onChange={(e) => {set_msg_box_val(isListening ? msg_box_val : e)}}
             />
           </ChatContainer>
         </MainContainer>
-        <button onClick={() => setIsListening((prevState) => !prevState)}>
-          {isListening ? "Stop" : "Start"} Listening
-        </button>
+        <button onClick={() => setIsListening((prevState) => !prevState)}>{isListening ? "Stop" : "Start"} Listening</button>
       </div>
     </div>
   );
